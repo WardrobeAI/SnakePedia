@@ -16,7 +16,7 @@ timelock controller, etc.
 
 ## Installation
 
-Just clone this directory. Then create a virtual environment. Finally,
+Just clone this project. Then create a virtual environment. Finally,
 install the dependencies using pip.
 
 ```bash
