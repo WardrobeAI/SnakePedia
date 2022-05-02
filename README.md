@@ -1,4 +1,4 @@
-# SnakePedia
+# 🐍📚 SnakePedia
 
 SnakePedia is a collection of Vyper code that are useful for daily jobs
 as a [Vyper](https://github.com/vyperlang/vyper) software engineer.
@@ -10,7 +10,7 @@ timelock controller, etc.
 
 ## Dependencies
 
-* [python3](https://www.python.org/downloads/release/python-3910/) version 3.7 or greater, python3-dev
+* [Python3](https://www.python.org/downloads/release/python-3910/) version 3.7 or greater, python3-dev
 * [Vyper](https://github.com/vyperlang/vyper)
 * [Brownie](https://github.com/eth-brownie/brownie)
 
