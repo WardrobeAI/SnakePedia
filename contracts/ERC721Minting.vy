@@ -4,8 +4,8 @@
 
 # Notice: Withdrawing ETH method is not implemented. Do it yourself!
 
-MAX_ELEMENTS: constant(uint256) = 100 # 100 items
-PRICE: constant(uint256) = 3 *10**16 # 0.03 ETH
+maxElements: uint256
+price: uint256
 
 # @dev Mapping from NFT ID to the address that owns it.
 idToOwner: HashMap[uint256, address]
@@ -39,9 +39,12 @@ interface NFTReceiver:
 
 
 # @dev Constructor
+# @param _maxElements Maximum number of NFTs that can be minted
+# @param _price Price of each NFT
 @external
-def __init__():
-    pass
+def __init__(_maxElements: uint256, _price: uint256):
+    self.maxElements = _maxElements
+    self.price = _price
 
 
 # @dev Transfer NFT ownership
@@ -88,8 +91,8 @@ def _mintAnElement(_to: address):
 @payable
 def mint(_to: address):
     total: uint256 = self.counter
-    assert total <= MAX_ELEMENTS, "Sale end"
-    assert msg.value >= PRICE, "Not enough ETH"
+    assert total < self.maxElements, "Sale end"
+    assert msg.value >= self.price, "Not enough ETH"
 
     self._mintAnElement(_to)
 
