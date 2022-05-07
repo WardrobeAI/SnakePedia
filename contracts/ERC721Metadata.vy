@@ -136,7 +136,7 @@ def balanceOf(_owner: address) -> uint256:
 # @dev Returns the address of the owner of the NFT. NFTs assigned to zero address are considered
 #      invalid, and queries about them do throw.
 # @param _tokenId The identifier for an NFT.
-@internal
+@external
 @view
 def ownerOf(_tokenId: uint256) -> address:
     assert self.idToOwner[_tokenId] != ZERO_ADDRESS
