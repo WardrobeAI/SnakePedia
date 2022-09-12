@@ -67,9 +67,20 @@ ownerToNFTokenCount: HashMap[address, uint256]
 ownerToOperators: HashMap[address, HashMap[address, bool]]
 
 # @dev Address of minter, who can mint a token
-minter: address
+creator: address
 
-baseURL: String[53]
+baseURL: String[256]
+
+name: String[53]
+
+symbol: String[10]
+
+price: uint256
+
+maxElements: uint256
+
+tokenIdTracker: uint256
+
 
 # @dev Static list of supported ERC165 interface ids
 SUPPORTED_INTERFACES: constant(bytes4[2]) = [
@@ -80,12 +91,20 @@ SUPPORTED_INTERFACES: constant(bytes4[2]) = [
 ]
 
 @external
-def __init__():
+def __init__(_name: String[20],
+             _symbol: String[5],
+             _baseURL: String[256],
+             _price: uint256,
+             _maxElements: uint256):
     """
     @dev Contract constructor.
     """
-    self.minter = msg.sender
-    self.baseURL = "https://api.babby.xyz/metadata/"
+    self.creator = msg.sender
+    self.baseURL = _baseURL
+    self.name = _name
+    self.price = _price
+    self.maxElements = _maxElements
+
 
 
 @pure
@@ -324,7 +343,7 @@ def setApprovalForAll(_operator: address, _approved: bool):
 ### MINT & BURN FUNCTIONS ###
 
 @external
-def mint(_to: address, _tokenId: uint256) -> bool:
+def mint_admin(_to: address, _tokenId: uint256) -> bool:
     """
     @dev Function to mint tokens
          Throws if `msg.sender` is not the minter.
@@ -334,14 +353,32 @@ def mint(_to: address, _tokenId: uint256) -> bool:
     @param _tokenId The token id to mint.
     @return A boolean that indicates if the operation was successful.
     """
-    # Throws if `msg.sender` is not the minter
-    assert msg.sender == self.minter
+    # Throws if `msg.sender` is not the creator
+    assert msg.sender == self.creator
     # Throws if `_to` is zero address
     assert _to != empty(address)
     # Add NFT. Throws if `_tokenId` is owned by someone
     self._addTokenTo(_to, _tokenId)
     log Transfer(empty(address), _to, _tokenId)
     return True
+
+
+@external
+@payable
+def mint(_to: address) -> bool:
+    total : uint256 = self.totalSupply()
+    assert total <= self.maxElements
+    assert msg.value >= self.price
+
+    self.tokenIdTracker = self.tokenIdTracker + 1
+    self._addTokenTo(_to, self.tokenIdTracker)
+    log Transfer(empty(address), _to, self.tokenIdTracker)
+    return True
+
+
+@internal
+def totalSupply() -> uint256:
+    return self.tokenIdTracker
 
 
 @external
@@ -365,6 +402,11 @@ def burn(_tokenId: uint256):
 
 @view
 @external
-def tokenURI(tokenId: uint256) -> String[132]:
+def tokenURI(tokenId: uint256) -> String[334]:
     return concat(self.baseURL, uint2str(tokenId))
+
+@external
+def withdraw():
+    assert msg.sender == self.creator
+    send(msg.sender, self.balance)
 
